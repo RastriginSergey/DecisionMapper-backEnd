@@ -1,4 +1,5 @@
 const Authentication = require('./controllers/authentication');
+const PokemonController = require('./controllers/pokemon');
 const passport = require('passport');
 const passportService = require('./services/passport');
 
@@ -8,13 +9,14 @@ const requireFacebook = passport.authenticate('facebook', {session: false});
 
 function routes(app) {
     app
-        .get('/', requireAuth, function (req, res, next) {
-            res.send('haha its work')
-        })
         .post('/signup', Authentication.signup)
         .post('/signin', requireSignIn, Authentication.signin)
         .get('/facebook', requireFacebook)
-        .get('/facebook/callback', requireFacebook, Authentication.signin);
+        .get('/facebook/callback', requireFacebook, Authentication.signin)
+        .get('/api/v1/pokemons/name', PokemonController.byName)
+        .get('/api/v1/pokemons/type', PokemonController.byType)
+        .get('/api/v1/pokemons/types', PokemonController.types)
+        .get('/api/v1/pokemons', PokemonController.all)
 }
 
 module.exports = routes;
