@@ -1,9 +1,13 @@
 {
-  "name": "coin",
+  "name": "pokedex-api-server",
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "nodemon app.js"
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "engines": {
+    "node": "7.8.0"
   },
   "dependencies": {
     "bcrypt-nodejs": "0.0.3",

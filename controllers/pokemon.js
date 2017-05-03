@@ -18,14 +18,14 @@ function byName(req, res, next) {
 function all(req, res, next) {
     const {limit, offset} = req.query;
     const interval = {
-        limit: parseInt(limit) || 100,
-        offset: parseInt(offset) || 0
+        limit: limit - 1 || 1,
+        offset: offset || 0
     };
 
     P.getPokemonsList(interval)
         .then(response => {
             const pokemons = response.results.map(item => P.getPokemonByName(item.name));
-            Promise.all(pokemons).then(result => res.json(result))
+            Promise.all(pokemons).then(result => res.json({result: result, count: response.count}))
         }).catch(error => next(error));
 }
 
