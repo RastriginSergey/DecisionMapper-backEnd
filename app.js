@@ -6,11 +6,10 @@ const http = require('http');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const passport = require('passport');
-const {dbURL} = require('./config');
 const routes = require('./routes');
 const app = express();
 
-mongoose.connect(dbURL);
+mongoose.connect(process.env.DB_URL);
 
 app.use(logger('dev'));
 app.use(bodyParser.json());

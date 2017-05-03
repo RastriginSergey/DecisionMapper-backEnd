@@ -1,10 +1,8 @@
 const passport = require('passport');
 const User = require('../models/user');
-const {secret} = require('../config');
 const {Strategy, ExtractJwt} = require('passport-jwt');
 const FacebookStrategy = require('passport-facebook');
 const LocalStrategy = require('passport-local');
-const {facebookSecret, facebookAppId} = require('../config');
 
 
 const localOptions = {usernameField: 'email'};
@@ -34,9 +32,9 @@ const localLogin = new LocalStrategy(localOptions, (email, password, done) => {
     });
 });
 const facebookLogin = new FacebookStrategy({
-        clientID: facebookAppId,
-        clientSecret: facebookSecret,
-        callbackURL: "http://localhost:3000/facebook/callback"
+        clientID: process.env.FACEBOOK_APP_ID,
+        clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
+        callbackURL: process.env.FACEBOOK_CALLBACK_URL
     },
     function (accessToken, refreshToken, profile, cb) {
         User.findOrCreate({facebookId: profile.id}, function (err, user) {
@@ -46,7 +44,7 @@ const facebookLogin = new FacebookStrategy({
 
 const jwtOptions = {
     jwtFromRequest: ExtractJwt.fromHeader('authorization'),
-    secretOrKey: secret
+    secretOrKey: process.env.SECRET
 };
 
 const jwtLogin = new Strategy(jwtOptions, (payload, done) => {

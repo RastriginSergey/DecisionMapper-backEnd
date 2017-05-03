@@ -1,11 +1,10 @@
 const User = require('../models/user');
 const passport = require('passport');
 const jwt = require('jwt-simple');
-const {secret} = require('../config');
 
 function tokenForUser(user) {
     const timestamp = new Date().getTime();
-    return jwt.encode({sub: user.id, iat: timestamp}, secret);
+    return jwt.encode({sub: user.id, iat: timestamp}, process.env.SECRET);
 }
 
 function signup(req, res, next) {

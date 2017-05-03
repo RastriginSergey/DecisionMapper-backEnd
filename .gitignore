@@ -1,5 +1,4 @@
 /node_modules
 /.vscode
 /.idea
-/app/build
-config.js
+.env
