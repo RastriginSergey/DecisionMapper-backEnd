@@ -1,6 +1,6 @@
 const Pokedex = require('pokedex-promise-v2');
 const P = new Pokedex();
-const http = require('http');
+const User = require('../models/user');
 
 function byName(req, res, next) {
     const {name} = req.query;
@@ -48,11 +48,81 @@ function types(req, res, next) {
         }).catch(error => next(error));
 }
 
+function getFavorites(req, res, next) {
+    User.findOne({"_id": req.user._id}, function (err, user) {
+        if (err) {
+            return next(err);
+        }
 
+        res.json({favorites: user.favorites});
+    });
+}
+
+
+function addFavorite(req, res, next) {
+    let favorite = req.body.favorite;
+
+    if (favorite && favorite.name) {
+        User.findOne({"_id": req.user._id}, function (err, user) {
+            if (err) {
+                return next(error);
+            }
+
+            const matches = user.favorites.some(item => {
+                if (item && item.name) {
+                    return item.name === favorite.name;
+                } else {
+                    return false;
+                }
+            });
+            if (!matches) {
+                user.favorites.push(favorite);
+                user.save(err => {
+                    if (err) {
+                        return next(err);
+                    }
+
+                    res.status(200).send('saved');
+                })
+            } else {
+                res.status(400).send('Already added');
+            }
+        });
+    } else {
+        res.status(400).send('Bad request');
+    }
+}
+
+function removeFavorite(req, res, next) {
+    let favorite = req.body.favorite;
+    if (favorite && favorite.name) {
+        User.findOne({"_id": req.user._id}, function (err, user) {
+            if (err) {
+                return next(err);
+            }
+
+            user.favorites = user.favorites.filter(item => {
+                return item.name !== favorite.name;
+            });
+
+            user.save(err => {
+                if (err) {
+                    return next(err);
+                } else {
+                    res.status(200).send('removed');
+                }
+            })
+        });
+    }
+
+}
 
 module.exports = {
     byName,
     byType,
     all,
-    types
+    types,
+    getFavorites,
+    addFavorite,
+    removeFavorite
 };

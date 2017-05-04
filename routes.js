@@ -17,6 +17,9 @@ function routes(app) {
         .get('/api/v1/pokemons/type', PokemonController.byType)
         .get('/api/v1/pokemons/types', PokemonController.types)
         .get('/api/v1/pokemons', PokemonController.all)
+        .get('/api/v1/favorite', requireAuth, PokemonController.getFavorites)
+        .post('/api/v1/favorite', requireAuth, PokemonController.addFavorite)
+        .delete('/api/v1/favorite', requireAuth, PokemonController.removeFavorite)
 }
 
 module.exports = routes;

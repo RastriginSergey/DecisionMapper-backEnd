@@ -9,6 +9,7 @@ const userSchema = new Schema({
     facebookId: String,
     email: {type: String, unique: true, lowercase: true},
     password: String,
+    favorites: Array
 });
 
 userSchema.pre('save', function (next) {
