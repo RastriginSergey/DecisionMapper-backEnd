@@ -1,9 +1,8 @@
 const passport = require('passport');
 const User = require('../models/user');
 const {Strategy, ExtractJwt} = require('passport-jwt');
-const FacebookStrategy = require('passport-facebook');
 const LocalStrategy = require('passport-local');
-
+const FacebookTokenStrategy = require('passport-facebook-token');
 
 const localOptions = {usernameField: 'email'};
 const localLogin = new LocalStrategy(localOptions, (email, password, done) => {
@@ -31,16 +30,16 @@ const localLogin = new LocalStrategy(localOptions, (email, password, done) => {
 
     });
 });
-const facebookLogin = new FacebookStrategy({
+
+const facebookLogin = new FacebookTokenStrategy({
         clientID: process.env.FACEBOOK_APP_ID,
-        clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
-        callbackURL: process.env.FACEBOOK_CALLBACK_URL
-    },
-    function (accessToken, refreshToken, profile, cb) {
-        User.findOrCreate({facebookId: profile.id}, function (err, user) {
-            return cb(err, user);
+        clientSecret: process.env.FACEBOOK_CLIENT_SECRET
+    }, function(accessToken, refreshToken, profile, done) {
+        User.findOrCreate({facebookId: profile.id}, function (error, user) {
+            return done(error, user);
         });
-    });
+    }
+);
 
 const jwtOptions = {
     jwtFromRequest: ExtractJwt.fromHeader('authorization'),

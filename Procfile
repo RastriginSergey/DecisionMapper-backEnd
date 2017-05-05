@@ -1,2 +1,2 @@
 web: node app.js
-dev: nodemon --inspect app.js
+dev: node --inspect app.js

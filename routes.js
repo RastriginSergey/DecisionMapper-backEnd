@@ -5,14 +5,13 @@ const passportService = require('./services/passport');
 
 const requireAuth = passport.authenticate('jwt', {session: false});
 const requireSignIn = passport.authenticate('local', {session: false});
-const requireFacebook = passport.authenticate('facebook', {session: false});
+const requireFacebook = passport.authenticate('facebook-token', {session: false});
 
 function routes(app) {
     app
         .post('/signup', Authentication.signup)
         .post('/signin', requireSignIn, Authentication.signin)
-        .get('/facebook', requireFacebook)
-        .get('/facebook/callback', requireFacebook, Authentication.signin)
+        .get('/facebook', requireFacebook, Authentication.signin)
         .get('/api/v1/pokemons/name', PokemonController.byName)
         .get('/api/v1/pokemons/type', PokemonController.byType)
         .get('/api/v1/pokemons/types', PokemonController.types)
