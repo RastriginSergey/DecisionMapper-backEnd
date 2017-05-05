@@ -37,7 +37,7 @@ function byType(req, res, next) {
                 res.json({pokemons: response.results})
             }).catch(error => next(error));
     } else {
-        res.status(403).send('Provide "type" parameter');
+        res.status(403).send({error: "Provide 'type' parameter"});
     }
 }
 
@@ -54,66 +54,62 @@ function getFavorites(req, res, next) {
             return next(err);
         }
 
-        res.json({favorites: user.favorites});
+        const promises = user.favorites.map((name, i) => {
+            return P.getPokemonByName(name)
+        });
+
+        Promise.all(promises)
+            .then(response => {
+                res.json({pokemons: response});
+            }).catch(error => next(error));
     });
 }
 
 
 function addFavorite(req, res, next) {
-    let favorite = req.body.favorite;
+    let favorite = req.body.name;
 
-    if (favorite && favorite.name) {
-        User.findOne({"_id": req.user._id}, function (err, user) {
-            if (err) {
-                return next(error);
-            }
+    User.findOne({"_id": req.user._id}, function (err, user) {
+        if (err) {
+            return next(error);
+        }
 
-            const matches = user.favorites.some(item => {
-                if (item && item.name) {
-                    return item.name === favorite.name;
-                } else {
-                    return false;
-                }
-            });
-            if (!matches) {
-                user.favorites.push(favorite);
-                user.save(err => {
-                    if (err) {
-                        return next(err);
-                    }
-
-                    res.status(200).send('saved');
-                })
-            } else {
-                res.status(400).send('Already added');
-            }
-        });
-    } else {
-        res.status(400).send('Bad request');
-    }
-}
-
-function removeFavorite(req, res, next) {
-    let favorite = req.body.favorite;
-    if (favorite && favorite.name) {
-        User.findOne({"_id": req.user._id}, function (err, user) {
-            if (err) {
-                return next(err);
-            }
-
-            user.favorites = user.favorites.filter(item => {
-                return item.name !== favorite.name;
-            });
-
+        const isMatch = user.favorites.includes(favorite);
+        if (!isMatch) {
+            user.favorites.push(favorite);
             user.save(err => {
                 if (err) {
                     return next(err);
-                } else {
-                    res.status(200).send('removed');
                 }
+
+                res.status(200).send({status: "Saved"});
             })
+        } else {
+            res.status(400).send({error: "Already added"});
+        }
+    });
+}
+
+function removeFavorite(req, res, next) {
+    let favorite = req.body.name;
+    User.findOne({"_id": req.user._id}, function (err, user) {
+        if (err) {
+            return next(err);
+        }
+
+        user.favorites = user.favorites.filter(name => {
+            return name !== favorite;
         });
-    }
+
+        user.save(err => {
+            if (err) {
+                return next(err);
+            } else {
+                res.status(200).send({status: "removed"});
+            }
+        })
+    });
+
 
 }
 

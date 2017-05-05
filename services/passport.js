@@ -22,7 +22,7 @@ const localLogin = new LocalStrategy(localOptions, (email, password, done) => {
                 if (isMatch) {
                     return done(null, user);
                 } else {
-                    return done(null, false);
+                    return done(null, false, "Password doesn't match");
                 }
             });
         } else {
